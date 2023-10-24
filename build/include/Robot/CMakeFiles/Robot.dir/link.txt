@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC  -std=c++17 -Wall -Wextra -fPIC -O2 -DNDEBUG -Wl,--no-undefined -shared -Wl,-soname,libRobot.so -o libRobot.so CMakeFiles/Robot.dir/CS_Indy7.cpp.o  -Wl,-rpath,/home/robot/mpc_ws/casadi/build/install_folder/lib /usr/lib/x86_64-linux-gnu/libjsoncpp.so.1.7.4 /home/robot/mpc_ws/casadi/build/install_folder/lib/libcasadi.so -ldl 

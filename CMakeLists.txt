@@ -113,52 +113,34 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS
 set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_DEBUG} -pg")
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 
-set(CAN_HEADERS_DIR ${PROJECT_SOURCE_DIR}/include/CAN)
+set(INTP_HEADERS_DIR ${PROJECT_SOURCE_DIR}/include/Interpolator)
+set(ROBOT_HEADERS_DIR ${PROJECT_SOURCE_DIR}/include/Robot)
+
 
 include_directories(${PROJ_INSTALL_INCLUDE_DIR})
 include_directories(
         ${KERNELHEADERS_DIR}
-        ${CAN_HEADERS_DIR}
+        ${INTP_HEADERS_DIR}
+        ${ROBOT_HEADERS_DIR}
 )
 
-add_subdirectory(include/CAN)
+add_subdirectory(include/Interpolator)
+add_subdirectory(include/Robot)
 
 add_executable(${PROJECT_NAME}
-        src/DEPENDENCY_TEST_Client.cpp
+        src/dependency_test.cpp
 )
 
-
-# libpcan
-find_path(PCAN_INCLUDE_DIR NAMES libpcanfd.h)
-find_library(PCAN_LIBRARY NAMES pcanfd)
-target_include_directories(${PROJECT_NAME} PUBLIC ${PCAN_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME}
-       sub::CAN
-       dl
-       ${PCAN_LIBRARY}
+        sub::Interpolator
+        sub::Robot
+        dl
 )
-message(STATUS "pcan library: ${PCAN_LIBRARY}")
-message(STATUS "pcan include: ${PCAN_INCLUDE_DIR}")
-# xenomai
-find_package(Xenomai 3.1.1 REQUIRED NATIVE)
-message(STATUS "Xenomai found with theses skins: ${Xenomai_SKINS}")
-if(Xenomai_FOUND)
-    target_include_directories(${PROJECT_NAME} PUBLIC ${KERNELHEADERS_DIR})
-    foreach(comp_lists ${Xenomai_FOUND_COMP})
-        #message(STATUS "Xenomai ${comp_lists} includes : ${Xenomai_${comp_lists}_INCLUDE_DIRS}" )
-        #message(STATUS "Xenomai ${comp_lists} definitions: ${Xenomai_${comp_lists}_DEFINITIONS}")
-        #message(STATUS "Xenomai ${comp_lists} LIBRARY_DIRS : ${Xenomai_${comp_lists}_LIBRARY_DIRS} ")
-        #message(STATUS "Xenomai ${comp_lists} LIBRARIES : ${Xenomai_${comp_lists}_LIBRARIES}")
-        #message(STATUS "Xenomai ${comp_lists} LDFLAGS : ${Xenomai_${comp_lists}_LDFLAGS}")
-        #message(STATUS "Xenomai ${comp_lists} DL_FLAGS : ${Xenomai_${comp_lists}_DL_FLAGS}")
 
-        target_include_directories(${PROJECT_NAME} PUBLIC ${Xenomai_${comp_lists}_INCLUDE_DIRS})
-        # target_link_libraries(${PROJECT_NAME} PUBLIC ${Xenomai_${comp_lists}_LIBRARY_DIRS} ${Xenomai_${comp_lists}_LIBRARIES})
-        target_link_libraries(${PROJECT_NAME} ${Xenomai_${comp_lists}_DL_FLAGS})
-        set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${Xenomai_${comp_lists}_DEFINITIONS})
-    endforeach(comp_lists ${Xenomai_SKINS})
-endif(Xenomai_FOUND)
-
+# jsoncpp
+find_package(jsoncpp REQUIRED)
+target_link_libraries(${PROJECT_NAME} jsoncpp_lib)
+list(APPEND INCLUDE_DIRS_FOR_DYNAMIC_VIEW ${jSONCPP_INCLUDE_DIRS})
 
 # check if Doxygen is installed
 #find_package(Doxygen)
